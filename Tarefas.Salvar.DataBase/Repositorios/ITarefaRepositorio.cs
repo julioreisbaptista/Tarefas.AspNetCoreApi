@@ -11,6 +11,6 @@ namespace Tarefas.Salvar.DataBase.Repositorios
     {
         void SalvarTarefa(Tarefa tarefa);
         List<Tarefa> BuscaTarefas();
-        Tarefa BuscaTarefa(long id);
+        Tarefa BuscaTarefa(int id);
     }
 }

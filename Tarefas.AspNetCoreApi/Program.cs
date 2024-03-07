@@ -1,9 +1,13 @@
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Tarefas.AMQP.Servicos;
 using Tarefas.AspNetCoreApi;
 using Tarefas.AspNetCoreApi.Services;
 using Tarefas.Salvar.DataBase.Repositorios;
+using Serilog;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,20 @@ builder.Host.ConfigureServices(s => {
     s.AddTransient<IRabbitMQService, RabbitMQService>();
     s.AddTransient<ITarefaRepositorio, TarefaRepositorio>();
     s.AddTransient(_ => new MySqlConnection(config["ConnectionStrings:Default"]));
+});
+
+//Log.Logger = new LoggerConfiguration()
+//    //.MinimumLevel..Debug()
+//    .WriteTo.File("logs/log.txt")
+//    .CreateLogger();
+
+builder.Host.ConfigureLogging((hostingContext, logging) =>
+{
+    logging.ClearProviders();
+    logging.AddSerilog(new LoggerConfiguration()
+       // .ReadFrom.Configuration(hostingContext.Configuration)
+        .WriteTo.File("logs/API.log")
+        .CreateLogger());
 });
 
 builder.Services.AddControllers();
@@ -48,3 +66,6 @@ app.UseCors(x => x
                .AllowCredentials()); // allow credentials
 
 app.Run();
+
+
+

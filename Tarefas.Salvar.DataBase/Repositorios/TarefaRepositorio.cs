@@ -1,83 +1,102 @@
 ﻿using Dapper;
-using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tarefas.Model.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace Tarefas.Salvar.DataBase.Repositorios
 {
     public class TarefaRepositorio : ITarefaRepositorio
     {
-        public static MySqlConnection GetSqlConnection()
+        private readonly ILogger<TarefaRepositorio> _logger;
+        private  string connectionString = "";
+
+        public TarefaRepositorio(ILogger<TarefaRepositorio> logger)
         {
-            return new MySqlConnection("server=127.0.0.1;uid=root;pwd=master;database=tarefas");
+            _logger = logger;
+
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+            connectionString = configuration.GetConnectionString("DefaultConnection");
+
+
+            
         }
-        
 
-        public Tarefa BuscaTarefa(long id)
+        public static MySqlConnection GetSqlConnection(string connectionString)
         {
-            // Execute uma consulta SQL para selecionar o registro com o id desejado.
-            using (var connection = GetSqlConnection())
+            return new MySqlConnection(connectionString);
+        }
+
+        public Tarefa BuscaTarefa(int id)
+        {
+            try
             {
-                string sql = "SELECT * FROM tarefas WHERE Id = @Id";
+                using (MySqlConnection connection = GetSqlConnection(connectionString))
+                {
+                    connection.Open();
+                    _logger.LogInformation("BuscaTarefa method called"); 
 
-                // Crie um objeto DynamicParameters e defina o parâmetro @Id com o valor desejado.
-                var parameters = new DynamicParameters();
-                parameters.Add("@Id", id); // Substitua 1 pelo id desejado.
-
-                // Execute a consulta SQL e armazene o resultado em uma variável.
-                return connection.QueryFirstOrDefault(sql, parameters);
-
+                    var query = "SELECT * FROM tarefas WHERE id = @Id";
+                    return connection.QueryFirstOrDefault<Tarefa>(query, new { Id = id });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar a tarefa"); 
+                return null;
             }
         }
+      
 
         public List<Tarefa> BuscaTarefas()
         {
             try
             {
-                using (MySqlConnection connection = GetSqlConnection())
+                using (MySqlConnection connection = GetSqlConnection(connectionString))
                 {
                     connection.Open();
+                    _logger.LogInformation("BuscaTarefas method called"); 
 
                     var query = "SELECT * FROM tarefas";
-
                     return connection.Query<Tarefa>(query).ToList();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao buscar os dados!");
+                _logger.LogError(ex, "Erro ao buscar os dados"); 
                 return new List<Tarefa>();
             }
-            
         }
 
+            
         public void SalvarTarefa(Tarefa tarefa)
         {
             try
             {
+                _logger.LogInformation("SalvarTarefa method called"); 
+
                 if (tarefa != null && tarefa.Id != 0)
                 {
-                    using (MySqlConnection connection = GetSqlConnection())
+                    using (MySqlConnection connection = GetSqlConnection(connectionString))
                     {
                         connection.Open();
 
-                        var query = "UPDATE tarefa SET Descricao = @Descricao, Data = @Data, Status = @Status WHERE Id = @Id";
+                        var query = "UPDATE tarefa SET Descricao = @Descricao, Data_criacao = @Data, Status = @Status WHERE Id = @Id";
 
                         connection.Execute(query, tarefa);
                     }
                 }
                 else
                 {
-                    using (MySqlConnection connection = GetSqlConnection())
+                    using (MySqlConnection connection = GetSqlConnection(connectionString))
                     {
                         connection.Open();
 
-                        var query = "INSERT INTO tarefas (Descricao, Data, Status) VALUES (@Descricao, @Data, @Status)";
+                        var query = "INSERT INTO tarefas (Descricao, Data_criacao, Status) VALUES (@Descricao, @Data, @Status)";
 
                         connection.Execute(query, tarefa);
                     }
@@ -85,10 +104,11 @@ namespace Tarefas.Salvar.DataBase.Repositorios
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Erro ao salvar a tarefa"); 
                 Console.WriteLine($"Erro ao inserir ou atualizar a tarefa {tarefa.Id}");
             }
-           
+
+            }
+
         }
-    }
 }
