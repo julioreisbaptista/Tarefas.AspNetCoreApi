@@ -4,6 +4,10 @@ using Tarefas.AMQP.Servicos;
 using Tarefas.AspNetCoreApi.Services;
 using Tarefas.Model.Models;
 using Tarefas.Salvar.DataBase.Repositorios;
+using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Tarefas.AspNetCoreApi.Controllers
 {
@@ -24,29 +28,14 @@ namespace Tarefas.AspNetCoreApi.Controllers
             _logger = logger;
         }
 
-        //[HttpPost(Name = "Salvar")]
-        //public ActionResult Post(Tarefa tarefa)
-        //{
-        //    if (_factoryRabbit.SendMessage(tarefa))
-        //        return Ok("Tarefa enviada com sucesso.");
-        //    else
-        //        return BadRequest();
-        //}
-
-
-        //[HttpGet(Name = "BuscaTodos")]
-        //public ActionResult<List<Tarefa>> Get()
-        //{
-        //    return _tarefaRepositorio.BuscaTarefas();
-        //}
-
-
         [HttpPost(Name = "Salvar")]
         public ActionResult Post(Tarefa tarefa)
         {
-            
+
+            var responseObject = JsonConvert.SerializeObject(tarefa);
+
             _logger.LogInformation("Recebendo requisição para salvar tarefa");
-            _logger.LogInformation($"Request: {0}",tarefa);
+            _logger.LogInformation($"Request: {0}", JsonConvert.SerializeObject(tarefa));
 
 
             if (_factoryRabbit.SendMessage(tarefa))

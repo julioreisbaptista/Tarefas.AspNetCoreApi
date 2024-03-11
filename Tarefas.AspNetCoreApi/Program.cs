@@ -25,10 +25,7 @@ builder.Host.ConfigureServices(s => {
     s.AddTransient(_ => new MySqlConnection(config["ConnectionStrings:Default"]));
 });
 
-//Log.Logger = new LoggerConfiguration()
-//    //.MinimumLevel..Debug()
-//    .WriteTo.File("logs/log.txt")
-//    .CreateLogger();
+
 
 builder.Host.ConfigureLogging((hostingContext, logging) =>
 {
