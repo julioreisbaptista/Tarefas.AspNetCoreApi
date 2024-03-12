@@ -24,6 +24,7 @@ namespace Tarefas.AMQP.Servicos
         {
             try
             {
+                if (tarefa.Descricao == null) return false;
                 var message = JsonConvert.SerializeObject(tarefa);
                 var body = Encoding.UTF8.GetBytes(message);
                 _channel.BasicPublish(exchange: "", routingKey: _queueName, basicProperties: null, body: body);
@@ -33,6 +34,14 @@ namespace Tarefas.AMQP.Servicos
             {
                 return false;
             }
+        }
+
+        public string GetMessage()
+        {
+            var result = _channel.BasicGet(queue: _queueName, autoAck: true);
+            if (result == null) return null;
+            var message = Encoding.UTF8.GetString(result.Body.ToArray());
+            return message;
         }
 
         public void StartListening(Action<string> messageHandler)

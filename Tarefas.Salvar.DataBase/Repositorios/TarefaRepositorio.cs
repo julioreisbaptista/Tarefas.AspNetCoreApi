@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Tarefas.Model.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient;
 
 namespace Tarefas.Salvar.DataBase.Repositorios
 {
@@ -28,6 +29,11 @@ namespace Tarefas.Salvar.DataBase.Repositorios
             return new MySqlConnection(connectionString);
         }
 
+        /// <summary>
+        /// Retrieves a specific task from the database based on the given id.
+        /// </summary>
+        /// <param name="id">The id of the task to retrieve.</param>
+        /// <returns>The task with the specified id, or null if not found.</returns>
         public Tarefa BuscaTarefa(int id)
         {
             try
@@ -49,6 +55,39 @@ namespace Tarefas.Salvar.DataBase.Repositorios
         }
 
 
+        /// <summary>
+        /// Retrieves a specific task from the database based on the given id.
+        /// </summary>
+        /// <param name="Tarefa">The object tarefa of the task to retrieve.</param>
+        /// <returns>The task with the specified id, or null if not found.</returns>
+        public Tarefa BuscaTarefa(Tarefa tarefa)
+        {
+            try
+            {
+                using (MySqlConnection connection = GetSqlConnection(connectionString))
+                {
+                    connection.Open();
+                    _logger.LogInformation("BuscaTarefa Chamado");
+
+                    var query = "SELECT * FROM tarefas " +
+                        "WHERE  Descricao = @Descricao and Data = @Data and @Status = Status ";
+
+                    var ret = connection.QueryFirstOrDefault<Tarefa>(query, tarefa);
+
+                    return ret;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar a tarefa");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all tasks from the database.
+        /// </summary>
+        /// <returns>A list of all tasks in the database.</returns>
         public List<Tarefa> BuscaTarefas()
         {
             try
@@ -69,43 +108,38 @@ namespace Tarefas.Salvar.DataBase.Repositorios
             }
         }
 
-
+        /// <summary>
+        /// Saves a task to the database.
+        /// </summary>
+        /// <param name="tarefa">The task to be saved.</param>
         public void SalvarTarefa(Tarefa tarefa)
         {
             try
             {
                 _logger.LogInformation("SalvarTarefa Chamado");
-
-                if (tarefa != null && tarefa.Id != 0)
-                {
+                if (tarefa != null)
                     using (MySqlConnection connection = GetSqlConnection(connectionString))
                     {
                         connection.Open();
 
-                        var query = "UPDATE tarefa SET Descricao = @Descricao, Data = @Data, Status = @Status WHERE Id = @Id";
+                        var ret = connection.QueryFirstOrDefault<Tarefa>("SELECT * FROM tarefas where Descricao = @Descricao and Data = @Data", tarefa);
 
-                        connection.Execute(query, tarefa);
+                        if (ret != null)
+                        {
+                            tarefa.Id = ret.Id;
+                            connection.Execute("UPDATE tarefas SET Descricao = @Descricao, Data = @Data, Status = @Status where Id = @Id", tarefa);
+                        }
+                        else
+                        {
+                            connection.Execute("INSERT INTO tarefas (Descricao, Data, Status) VALUES (@Descricao, @Data, @Status)", tarefa);
+                        }
                     }
-                }
-                else
-                {
-                    using (MySqlConnection connection = GetSqlConnection(connectionString))
-                    {
-                        connection.Open();
-
-                        var query = "INSERT INTO tarefas (Descricao, Data, Status) VALUES (@Descricao, @Data, @Status)";
-
-                        connection.Execute(query, tarefa);
-                    }
-                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao salvar a tarefa");
                 Console.WriteLine($"Erro ao inserir ou atualizar a tarefa {tarefa.Id}");
             }
-
         }
-
     }
 }

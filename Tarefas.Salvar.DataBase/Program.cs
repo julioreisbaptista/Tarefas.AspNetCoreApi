@@ -18,7 +18,7 @@ hostBuilder.ConfigureLogging((hostingContext, logging) =>
 {
     
     logging.AddSerilog(new LoggerConfiguration()
-        // .ReadFrom.Configuration(hostingContext.Configuration)
+
         .WriteTo.File("logs/DataBase.log")
         .CreateLogger());
 });

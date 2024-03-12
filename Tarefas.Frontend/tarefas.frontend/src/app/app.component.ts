@@ -36,6 +36,7 @@ export class AppComponent implements OnInit {
     this.BuscaTarefas();
   }
 
+
   Salvar() {
     this.tarefa.descricao = this.formulario.get('descricao').value;
     this.tarefa.data = this.formulario.get('data').value;
@@ -46,6 +47,8 @@ export class AppComponent implements OnInit {
         'Referrer-Policy': 'strict-origin-when-cross-origin'
       })
     };
+
+    alert('Requisição enviada!');
 
     this.http.post('https://localhost:7093/Tarefa', this.tarefa, httpOptions).subscribe(
       (resposta) => {
