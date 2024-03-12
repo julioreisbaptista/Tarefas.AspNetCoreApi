@@ -1,8 +1,8 @@
-DROP database tarefasteste;
+DROP database tarefas;
 
-CREATE DATABASE tarefasteste;
+CREATE DATABASE tarefas;
 
-USE tarefasteste;
+USE tarefas;
 
 DROP TABLE IF EXISTS `tarefas`;
 
