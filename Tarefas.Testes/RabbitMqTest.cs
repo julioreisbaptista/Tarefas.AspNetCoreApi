@@ -62,14 +62,14 @@ namespace TestTarefas
                 Status = 1
             };
             RabbitMQService rabbitMQService = new RabbitMQService();
-            Tarefa retTarefa = null;
-
+            
             // Act
             bool result = rabbitMQService.SendMessage(tarefa);
             string message = rabbitMQService.GetMessage();
-            retTarefa = JsonConvert.DeserializeObject<Tarefa>(message);
+            Tarefa retTarefa = JsonConvert.DeserializeObject<Tarefa>(message);
 
             // Assert
+            Assert.IsNotNull(retTarefa);
             Assert.IsTrue(result);
             Assert.AreEqual(tarefa.Data, retTarefa.Data);
             Assert.AreEqual(tarefa.Descricao, retTarefa.Descricao);

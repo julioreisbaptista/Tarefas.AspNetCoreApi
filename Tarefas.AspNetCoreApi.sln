@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarefas.Salvar.DataBase", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarefas.AMQP", "Tarefas.AMQP\Tarefas.AMQP.csproj", "{BD96776F-A204-49E3-9D78-AF7864D3E2C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTarefas", "TestTarefas\TestTarefas.csproj", "{C2421A17-076B-4979-954E-CC8D3FE8F128}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tarefas.Testes", "Tarefas.Testes\Tarefas.Testes.csproj", "{C2421A17-076B-4979-954E-CC8D3FE8F128}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
