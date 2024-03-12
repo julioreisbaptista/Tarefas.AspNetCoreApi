@@ -48,17 +48,17 @@ export class AppComponent implements OnInit {
       })
     };
 
-    alert('Requisição enviada!');
+    
 
     this.http.post('https://localhost:7093/Tarefa', this.tarefa, httpOptions).subscribe(
       (resposta) => {
         console.log('Requisição enviada com sucesso!', resposta);
-        this.BuscaTarefas();
       },
       (erro) => {
         console.log('Erro ao enviar requisição:', erro);
       }
     );
+	alert('Requisição enviada!');
     console.log(this.tarefa);
   }
 

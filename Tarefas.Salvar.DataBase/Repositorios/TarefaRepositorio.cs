@@ -108,6 +108,34 @@ namespace Tarefas.Salvar.DataBase.Repositorios
             }
         }
 
+
+        /// <summary>
+        /// Retrieves all tasks from the database.
+        /// </summary>
+        /// <returns>A list of all tasks in the database.</returns>
+        public List<Tarefa> BuscaTarefas(Tarefa tarefa)
+        {
+            try
+            {
+                using (MySqlConnection connection = GetSqlConnection(connectionString))
+                {
+                    connection.Open();
+                    _logger.LogInformation("BuscaTarefas Chamado");
+
+                    var query = "SELECT * FROM tarefas  "
+                         +
+                        "WHERE  Descricao = @Descricao and Data = @Data and @Status = Status ";
+                    ;
+                    return connection.Query<Tarefa>(query,tarefa).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar os dados");
+                return new List<Tarefa>();
+            }
+        }
+
         /// <summary>
         /// Saves a task to the database.
         /// </summary>
