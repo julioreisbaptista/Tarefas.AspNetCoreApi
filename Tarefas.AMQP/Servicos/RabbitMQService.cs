@@ -17,7 +17,7 @@ namespace Tarefas.AMQP.Servicos
             var factory = FactoryModel.CreateModel();
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
         }
 
         public bool SendMessage(Tarefa tarefa)

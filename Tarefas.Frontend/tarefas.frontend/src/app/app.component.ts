@@ -59,6 +59,7 @@ export class AppComponent implements OnInit {
       }
     );
 	alert('Requisição enviada!');
+	this.BuscaTarefas();
     console.log(this.tarefa);
   }
 
